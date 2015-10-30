@@ -3,6 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
+from pyvirtualdisplay import Display
 import time
 
 #driver = webdriver.Firefox()
@@ -10,23 +11,16 @@ import time
 #AutoItSetOption("WinTitleMatchMode",2)
 #WinSetState(driver.get('https://ixpress-server2.uc.edu/Registration/Register.asp'),"",SW_HIDE)
 
-TITLE_FONT = ("Helvetica", 14, "bold")
+TITLE_FONT = ("Comic Sans", 18, "bold")
 terms = ["Spring 2015-16","Summer 2015-16","Fall 2016-17","Spring 2016-17",
          "Summer 2016-17","Fall 2017-18","Spring 2017-18"]
 totalClasses = ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14"]
-'''
-class containName(username):
-    user = username
 
-class containPass(password):
-    passw = password
+new_display = Display(visible=0,size=(800, 600))
+new_display.start()
+driver = webdriver.Firefox()
+driver.get('https://ixpress-server2.uc.edu/Registration/Register.asp')
 
-class containTerm(term):
-    term = term
-
-class containNumbers(numbers):
-    searchNumbers = numbers
-'''
 
 global user_name
 global pass_word
@@ -56,8 +50,7 @@ class theApplication(Tk):
             # the one on the top of the stacking order
             # will be the one that is visible.
             frame.grid(row=0, column=0, sticky="nsew")
-            #container.grid_rowconfigure(0, weight=1)
-            #container.grid_columnconfigure(0, weight=1)
+
 
         self.show_frame(Login)
 
@@ -76,10 +69,7 @@ class Login(Frame):
 
         label = Label(self, text="The Class Submitter", font=TITLE_FONT)
         label.grid()
-        #Frame.grid()
-       #Grid.grid_rowconfigure(self,0, weight=1)
-        #Grid.grid_columnconfigure(self,0, weight=1)
-        
+
         u = StringVar(self)
         p = StringVar(self)
         
@@ -92,15 +82,12 @@ class Login(Frame):
         self.password = Entry(self,textvariable=p)
         self.password.grid(row=4,column=1)
         
-        #Login.passw = self.password.get()
         self.quitButton = Button(self,text='Quit', command=self.destroy)
         self.quitButton.grid(row=6,pady=10,ipadx=10,padx=15,sticky='SW',column=1)
 
         self.newsButton = Button(self,text='Submit', command=self.combineFunc)
         self.newsButton.grid(row=6,pady=10,padx=15,sticky='SE',column=1)
 
-        #test= Button(self,text='thetesting',command=self.getPass)
-        #test.pack()
 
     def combineFunc(self):
         self.getName()
@@ -111,12 +98,10 @@ class Login(Frame):
         lambda: self.controller.show_frame(Term)
 
     def getName(self):
-        print(self.username.get())
         global user_name
         user_name = self.username.get()        
         return self.username.get()
     def getPass(self):
-        print(self.password.get())
         global pass_word
         pass_word = self.password.get()
         return self.password.get()
@@ -126,8 +111,6 @@ class Term(Frame):
     def __init__(self, parent, controller):
         Frame.__init__(self, parent)
         Frame.configure(self,width=10,height=10)
-        #Frame.grid_rowconfigure(0, weight=1)
-        #Frame.grid_columnconfigure(0, weight=1)
         self.controller = controller
         label = Label(self, text="The Term Page", font=TITLE_FONT)
         label.grid()
@@ -160,8 +143,6 @@ class SearchNumbers(Frame):
         self.cur_value = 0
         self.count = 0
         self.controller = controller
-        #self.frame = Frame(self)
-        #self.frame.grid()
         label = Label(self, text="Your Call Numbers", font=TITLE_FONT)
         label.grid()
         button = Button(self, text="Back",
@@ -184,19 +165,11 @@ class SearchNumbers(Frame):
 
 
     def optUpdate(self,value):
-        print("--------UPDATE--------")
         self.value = int(value)
-        #self.first_frame = Frame(self)
-        #self.first_frame.grid()
-        print ('value: ' + str(self.value))
-        print ('count: ' + str(self.count))
-        print('currentValue: ' + str(self.cur_value))
         if(self.value >= 0):
             if(self.value != self.cur_value):
-               # self.frame = Frame(self.first_frame)
-                #self.frame.grid()
-
                 if (self.cur_value < self.value):
+                    
                     for i in range(self.cur_value,self.value):
                         self.label = Label(self.frame, text='Call Number ' + str(i+1))
                         self.label.grid(row=i,column=0)
@@ -207,32 +180,15 @@ class SearchNumbers(Frame):
                         self.count += 1
                         
                 elif(self.cur_value > self.value):
-                    print('in Second elif')
-                    print('cur_val: ')
-                    print(self.cur_value)
-                    print('value: ')
-                    print(self.value)
-
                     for i in range(self.value,self.cur_value):
                         index = self.value
-                        print('i: ')
-                        print(i)
                   
                         self.arrayOfLabels[index].grid_forget()
                         del self.arrayOfLabels[index]
                         self.arrayOfEntries[index].grid_forget()
                         del self.arrayOfEntries[index]
 
-        print('Exits If Statement')
-
-        print(self.arrayOfEntries)
-        print(self.arrayOfLabels)
-        
         self.cur_value = self.value
-        print('currentValueAfterIf: ' + str(self.cur_value))
-        print ('afterIfcount: ' + str(self.count))
-        #print('sizeOfFrameAfterIf: ' + str(len(self.frame.winfo_children())/2))
-        print("--------ENDOFUPDATE--------")
 
     def combineFunc(self):
         self.getNumbs()
@@ -240,13 +196,9 @@ class SearchNumbers(Frame):
 
     def getNumbs(self):
         value = int(self.w.cget('text'))
-        print (value)
         arr = [None] * value
         for i in range(0,value):
-            print (arr[i])
-            arr[i] = self.e.get()
-            print ('after arr[i] placed')
-            print (arr[i])
+            arr[i] = self.arrayOfEntries[i].get()
         global search_nums
         search_nums = arr
         return arr
@@ -254,12 +206,6 @@ class SearchNumbers(Frame):
 class doMagic():
 
     def __init__(self):
-        #app.quit()
-        #username = Login.getName()
-        #password = Login.getPass()
-        #term = Term.getTerm()
-        #callNumbs = SearchNumbers.getNumbs()
-        
         print (user_name)
         print (pass_word)
         print (term_sem)
