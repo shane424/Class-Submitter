@@ -45,7 +45,7 @@ class theApplication(Tk):
         Grid.grid_columnconfigure(self,0, weight=1)
 
         self.frames = {}
-        for F in (Login, Term, SearchNumbers):
+        for F in (Login, HelpMe1, HelpMe2, HelpMe3, HelpMe4, Term, SearchNumbers):
             frame = F(container, self)
             self.frames[F] = frame
             # put all of the pages in the same location;
@@ -61,6 +61,7 @@ class theApplication(Tk):
         frame = self.frames[c]
 
         frame.tkraise()
+    
 
 class Login(Frame):
 
@@ -106,12 +107,12 @@ class Login(Frame):
         self.timeMatters = Checkbutton(self,text='Does time matter?',variable=self.timebutton)
         self.timeMatters.grid(row=8,column=0)
 
+        self.helpButton = Button(self,text='Help',command=lambda: controller.show_frame(HelpMe1))
+        self.helpButton.grid(row=9,column=1)
+
     def combineFunc(self):
         self.getInfo()
         self.controller.show_frame(Term)
-
-    def toTerm(self,controller):
-        lambda: self.controller.show_frame(Term)
 
     def getInfo(self):
         global user_name
@@ -150,8 +151,84 @@ class Login(Frame):
         retnumb = str(newnumbs) +ending
         time_now = datetime.datetime.strptime(retnumb,"%H:%M").time()
         return time_now
-        
-        
+
+class HelpMe1(Frame):
+
+    def __init__(self, parent, controller):
+
+        Frame.__init__(self, parent)
+        self.controller = controller
+        label = Label(self, text=
+                      "This application is to help get the classes you want. \n"+
+                      "You will have to enter your 6+2 UC username and password\n for it to work.\n"+
+                      "You will then enter the time and date of when you are \nallowed to register for classes.\n"+
+                      "You do not need to do this, if no time/date is given\n then it will assume you can register right away.\n"+
+                      "If you wish to use time/date, you must check the box\n that asks if time is important.\n"
+                      ,font=11)
+        label.grid()
+        self.nxButton = Button(self,text="continue",command=lambda: self.controller.show_frame(HelpMe2))
+        self.nxButton.grid()
+        self.back = Button(self, text="Back",
+                command=lambda: controller.show_frame(Login))
+        self.back.grid()
+
+class HelpMe2(Frame):
+
+    def __init__(self, parent, controller):
+
+        Frame.__init__(self, parent)
+        self.controller = controller
+        label = Label(self, text=
+                      "You will then enter in your date and time in the format\n provided. If it is in the morning then you\n"+
+                      "must check the box saying AM, if not it will assume \nthat it is in the evening.\n"+
+                      "After entering your credentials and optional time/date,\n"+
+                      "you will then have to select which term you are trying to\n"+
+                      "register classes for.\n"+
+                      "Once a term is selected, you must select how many \n"+
+                      "classes you want to register for, and then enter their \n"+
+                      "call numbers in.(Found from the class)"
+                        ,font=11)
+        label.grid()
+        self.nxButton = Button(self,text="continue",command=lambda: self.controller.show_frame(HelpMe3))
+        self.nxButton.grid()
+        self.back = Button(self, text="Back",
+                command=lambda: controller.show_frame(HelpMe1))
+        self.back.grid()
+
+class HelpMe3(Frame):
+
+    def __init__(self, parent, controller):
+
+        Frame.__init__(self, parent)
+        self.controller = controller
+        label = Label(self, text=
+                      "Once you hit submit on the call number page, it will start.\n"+
+                      "It will most likely slow your computer down if you run it\n and try to do other things in the meantime.\n"+
+                      "I would recommend using this if you are leaving and \n have no internet, or for registering for classes in the morning.\n"
+                      ,font=11)
+        label.grid()
+        self.nxButton = Button(self,text="continue",command=lambda: self.controller.show_frame(HelpMe4))
+        self.nxButton.grid()
+        self.back = Button(self, text="Back",
+                command=lambda: controller.show_frame(HelpMe2))
+        self.back.grid()
+
+class HelpMe4(Frame):
+
+    def __init__(self, parent, controller):
+
+        Frame.__init__(self, parent)
+        self.controller = controller
+        label = Label(self, text=
+                       "DISCLAIMER:\n IT WILL NOT WORK IF YOU ENTER \nA CALL NUMBER IN WRONG. NO CLASSES WILL BE\n ADDED IF THAT HAPPENS\n"+
+                      "IF YOUR 6+2 USERNAME/PASSWORD IS \nINCORRECT NOTHING WILL HAPPEN THEN.\n"+
+                      "PLEASE BE CAREFUL AND DOUBLE\n CHECK THE CALL NUMBERS YOU ENTER"
+                      ,font=11)
+        label.grid()
+        self.back = Button(self, text="Back",
+                command=lambda: controller.show_frame(HelpMe3))
+        self.back.grid()
+
 class Term(Frame):
 
     def __init__(self, parent, controller):
