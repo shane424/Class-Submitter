@@ -3,7 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
-from pyvirtualdisplay import Display
+#from pyvirtualdisplay import Display
 import datetime
 import time
 import sys
@@ -28,6 +28,7 @@ global search_numbs
 global date_now
 global time_now
 global full_date
+global time_needed
 
 class theApplication(Tk):
 
@@ -75,6 +76,7 @@ class Login(Frame):
         d = StringVar(self)
         t = StringVar(self)
         self.cb = IntVar(self)
+        self.timebutton = IntVar(self)
         
         self.un = Label(self,text='Username(6+2)')
         self.un.grid(row=3,column=0)
@@ -101,7 +103,8 @@ class Login(Frame):
 
         self.amButton = Checkbutton(self,text='AM',variable=self.cb)
         self.amButton.grid(row=7,column=0)
-
+        self.timeMatters = Checkbutton(self,text='Does time matter?',variable=self.timebutton)
+        self.timeMatters.grid(row=8,column=0)
 
     def combineFunc(self):
         self.getInfo()
@@ -114,21 +117,27 @@ class Login(Frame):
         global user_name
         global pass_word
         global date_now
-        global time_now
         global full_date
         global time_now
-        the_time = ""
-        time_now = self.timeEntry.get()
-        if(self.cb.get() != 1):
-            self.convertTo24(time_now)
+        global time_needed
+        if(self.timeMatters == 1):
+            the_time = ""
+            time_now = self.timeEntry.get()
+            if(self.cb.get() != 1):
+                self.convertTo24(time_now)
+            else:
+                time_now = datetime.datetime.strptime(time_now,"%H:%M").time()
+            user_name = self.username.get()
+            pass_word = self.password.get()
+            date_now = datetime.datetime.strptime(self.dateEntry.get(),"%m/%d/%Y")
+            time_needed = 1
+            full_date = date_now.combine(date_now,time_now)
+            return user_name,pass_word,date_now,time_now,full_date
         else:
-            time_now = datetime.datetime.strptime(time_now,"%H:%M").time()
-        user_name = self.username.get()
-        pass_word = self.password.get()
-        date_now = datetime.datetime.strptime(self.dateEntry.get(),"%m/%d/%Y")
-        date_now
-        full_date = date_now.combine(date_now,time_now)
-        return user_name,pass_word,date_now,time_now,full_date
+            user_name = self.username.get()
+            pass_word = self.password.get()
+            time_needed = 0
+            return user_name,pass_word
 
     def endIt(self):
         self.controller.destroy()
@@ -253,10 +262,51 @@ class doMagic():
     def StartSelenium(self):
         regcheck = 0
         while regcheck == 0:
-            now = datetime.datetime.now()
-            if(now >= full_date):
-                print(now)
-                print(full_date)
+            if(time_needed == 1):
+                now = datetime.datetime.now()
+                if(now >= full_date):
+                    print(now)
+                    print(full_date)
+                    check = 0
+                    check_counter = 0
+                    driver = webdriver.Firefox()
+                    driver.get('https://ixpress-server2.uc.edu/Registration/Register.asp')
+                    time.sleep(3)
+                    user = driver.find_element_by_name("Username")
+                    passw = driver.find_element_by_name("Password")
+                    user.send_keys(user_name)
+                    passw.send_keys(pass_word)
+                    # Clicks log in
+                    log = driver.find_element_by_xpath("//input[@value='Log In']").click()
+                    # Hits register
+                    time.sleep(3)
+                    regbut = driver.find_element_by_xpath("//input[@value='Register']").click()
+                    # Finds drop down
+                    time.sleep(1)
+                    termcode = driver.find_element_by_name("TermCode")
+                    selection = Select(termcode.find_element_by_xpath("//select[@name='TermCode']"))
+                    # Clicks semester
+                    selection.select_by_visible_text(term_sem)
+                    conbut = driver.find_element_by_xpath("//input[@value='Continue']").click()
+                    # Writes numbers into search boxes
+                    count = 7
+                    for i in search_nums:
+                        print (i)
+                        inp = '//input[@name=\''
+                        callnumb = 'CallNumber'
+                        endBrack = '\']'
+                        call = inp+callnumb+(str(count))+endBrack
+                        numb1 = driver.find_element_by_xpath(call)
+                        numb1.send_keys(i)
+                        count += 1
+                    while check != 50:
+                        sub = driver.find_element_by_xpath("//input[@value='Submit']").click()
+                        time.sleep(7)
+                        check += 1
+
+                    driver.close()
+                    regcheck = 1
+            else:
                 check = 0
                 check_counter = 0
                 driver = webdriver.Firefox()
