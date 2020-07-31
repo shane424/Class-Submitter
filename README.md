@@ -1,3 +1,7 @@
+Run setup.py to create an executable.
+2.7files is the final code.
+
+
 # This no longer works due to UC's change in online portal. Worked before Catalyst upgrade.
 ![Application Preview1](https://github.com/shane424/Class-Submitter/blob/master/GUI.PNG)\
 Input username and password for UC Catalyst.
